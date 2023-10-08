@@ -1,31 +1,17 @@
+import React, { useMemo, useRef, useState } from 'react'
 import { createAutocomplete } from "@algolia/autocomplete-core";
-import { getAlgoliaResults } from "@algolia/autocomplete-js";
-import "@algolia/autocomplete-theme-classic";
-import { searchClientAlgolia } from "index";
-import React, { useState, useRef, useMemo } from "react";
+import { getAlgoliaResults } from '@algolia/autocomplete-js';
+import algoliasearch from 'algoliasearch';
+import {ALGOLIA_API_KEY, ALGOLIA_APP_ID} from '../../constants'
+import PokemonCard from './PokemonCard';
 
-const ProductItem = ({ nameSpanish, setValue }) => {
-	const [hovered, setHovered] = useState(false);
-
-	return (
-		<div
-			className="list-group-item cursor-pointer"
-			style={{ backgroundColor: hovered ? "#e2e6ea" : "transparent" }}
-			onMouseEnter={() => setHovered(true)}
-			onMouseLeave={() => setHovered(false)}
-			onClick={() => setValue(nameSpanish)}
-		>
-			{nameSpanish}
-		</div>
-	);
-};
+const searchClient = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_API_KEY)
 
 const AlgoliaAutocomplete = (props) => {
 	const [autocompleteState, setAutocompleteState] = useState({
 		collections: [],
 		isOpen: false,
 	});
-	const searchClient = searchClientAlgolia;
 	const autocomplete = useMemo(
 		() =>
 			createAutocomplete({
@@ -43,12 +29,12 @@ const AlgoliaAutocomplete = (props) => {
 									searchClient,
 									queries: [
 										{
-											indexName: "equipment",
+											indexName: "pokemon_name",
 											query,
 											params: {
-												hitsPerPage: 10,
+												hitsPerPage: 5,
 												attributesToSnippet: [
-													"nameSpanish:10",
+													"name:10",
 												],
 												snippetEllipsisText: "...",
 											},
@@ -78,17 +64,17 @@ const AlgoliaAutocomplete = (props) => {
 
 	return (
 		<div {...formProps} ref={formRef}>
-			<div className="form-group">
+			<div className="mb-4">
 				<input
 					type="text"
-					className="form-control"
+                    className="w-full px-4 py-2 border rounded-md"
 					{...inputProps}
 					ref={inputRef}
 				/>
 			</div>
 			{autocompleteState.isOpen && (
 				<div
-					className="autocomplete-panel mt-2"
+                    className="mt-2 rounded-md border border-gray-300"
 					ref={panelRef}
 					{...autocomplete.getPanelProps()}
 				>
@@ -102,10 +88,13 @@ const AlgoliaAutocomplete = (props) => {
 										className="list-group"
 									>
 										{items.map((item, index) => (
-											<ProductItem
+											<PokemonCard
 												key={index}
-												setValue={props.setValue}
-												{...item}
+                                                name={item.name}
+                                                img_url={item.img_url}
+                                                types={item.types}
+												weight={item.weight}
+												region={item.region}
 											/>
 										))}
 									</div>

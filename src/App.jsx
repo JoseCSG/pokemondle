@@ -1,6 +1,7 @@
 import { collection, doc, getDoc, getDocs, getFirestore, query, where } from 'firebase/firestore';
 import React, { Fragment, useState } from 'react'
 import PokemonCard from './components/PokemonCard';
+import AlgoliaAutocomplete from './components/AlgoliaAutocomplete';
 
 const getPokemonFromFirestore = async (pokemonName) => {
   const db = getFirestore();
@@ -39,6 +40,7 @@ function App() {
           Get Pokemon
         </button>
       </form>
+      <AlgoliaAutocomplete />
       <h2 className='text-2xl text-red-900'>Pokemons guessed so far</h2>
       <ul>
         {pokemons?.map((pokemon, index) => (
